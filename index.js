@@ -26,11 +26,18 @@ document.querySelector('#search').addEventListener('submit', async (event) => {
     const userName = document.querySelector('#findByUsername').value
 
     const profile = await getUser(userName)
+    const repos = await getRepos(profile)
 
     showProfile(profile)
+    showRepos(repos)
 })
 
+async function getRepos(profile){
+    const res =  await fetch(`${profile.repos_url}?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}$per_page=5`)
+    const repo = await res.json()
 
+    return repo
+}
 
 function showProfile(profile){
     document.querySelector('.profile').innerHTML = `
@@ -61,4 +68,24 @@ function showProfile(profile){
     <ion-icon name="location-outline"></ion-icon>Lille, France
   </p>
     `
+}
+
+function showRepos(repos){
+    let newHtml = ''
+    for(let repo of repos){
+        newHtml += `
+        <div class="repo">
+        <div class="repo_name">
+          <a href="${repo.url}">${repo.name}</a>
+        </div>
+        <p>
+          <span class="circle"></span> JavaScript
+          <ion-icon name="star-outline"></ion-icon> 941
+          <ion-icon name="git-branch-outline"></ion-icon> 687
+        </p>
+      </div>
+        
+        `
+    }
+    document.querySelector('.repos').innerHTML = newHtml
 }
